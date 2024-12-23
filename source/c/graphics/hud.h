@@ -2,13 +2,22 @@
 #define PRG_BANK_HUD 2
 
 #define HUD_POSITION_START 0x0300
-#define HUD_HEART_START 0x0361
-#define HUD_KEY_START 0x037d
+#define HUD_HEART_START 0x0321
+#define HUD_SCORE_START 0x0361
+#define HUD_KEY_START 0x03a1
 #define HUD_ATTRS_START 0x03f0
 
-#define HUD_TILE_HEART 0xe7
-#define HUD_TILE_HEART_EMPTY 0xe9
-#define HUD_TILE_KEY 0xe8
+#define HUD_TILE_HEART 0xd4
+#define HUD_TILE_HEART_EMPTY 0xd5
+#define HUD_TILE_SCORE 0xd6
+#define HUD_TILE_KEY 0xd7
+#define HUD_TILE_SWORD 0xd8
+#define HUD_TILE_BOMB 0xda
+#define HUD_TILE_MAGIC 0xdb
+#define HUD_TILE_ITEM_SEL 0xe6
+#define HUD_TILE_ITEM_SER 0xe7
+#define HUD_TILE_ITEM_UNL 0xe8
+#define HUD_TILE_ITEM_UNR 0xe9
 #define HUD_TILE_NUMBER 0xf6
 #define HUD_TILE_BLANK 0xf2
 #define HUD_TILE_BORDER_BL 0xf4
