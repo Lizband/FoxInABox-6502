@@ -1,14 +1,15 @@
 {
     "activeFile": "overworld.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
         "overworld.tmx": {
-            "scale": 2,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 71.5,
-                "y": 174.75
+                "x": 182.66666666666666,
+                "y": 124.66666666666664
             }
         },
         "overworld.tmx#Overworld Tiles": {
