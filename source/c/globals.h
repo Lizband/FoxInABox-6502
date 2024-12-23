@@ -11,10 +11,16 @@ ZEROPAGE_EXTERN(unsigned char, gameState);
 ZEROPAGE_EXTERN(unsigned char, i);
 ZEROPAGE_EXTERN(unsigned char, j);
 ZEROPAGE_EXTERN(unsigned char, playerHealth);
+ZEROPAGE_EXTERN(unsigned char, playerScoreCount);
 ZEROPAGE_EXTERN(unsigned char, playerKeyCount);
 ZEROPAGE_EXTERN(unsigned char, playerMaxHealth);
+ZEROPAGE_EXTERN(unsigned char, playerSelectedItem);
+ZEROPAGE_EXTERN(unsigned char, playerHasSword);
+ZEROPAGE_EXTERN(unsigned char, playerHasBomb);
+ZEROPAGE_EXTERN(unsigned char, playerHasMagic);
 ZEROPAGE_EXTERN(unsigned char, currentWorldId);
 
+ZEROPAGE_EXTERN(unsigned char, charoffset);
 ZEROPAGE_ARRAY_EXTERN(unsigned char, screenBuffer, 0x20);
 
 ZEROPAGE_EXTERN(unsigned char, controllerState);
