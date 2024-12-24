@@ -1,3 +1,6 @@
+// -------------------
+// IMPORTS
+// -------------------
 #include "source/c/neslib.h"
 #include "source/c/sprites/player.h"
 #include "source/c/library/bank_helpers.h"
@@ -15,7 +18,9 @@
 
 CODE_BANK(PRG_BANK_PLAYER_SPRITE);
 
-// Some useful global variables
+// -------------------
+// GLOBAL VARIABLES
+// -------------------
 ZEROPAGE_DEF(int, playerXPosition);
 ZEROPAGE_DEF(int, playerYPosition);
 ZEROPAGE_DEF(int, playerXVelocity);
@@ -26,7 +31,9 @@ ZEROPAGE_DEF(unsigned char, playerControlsLockTime);
 ZEROPAGE_DEF(unsigned char, playerInvulnerabilityTime);
 ZEROPAGE_DEF(unsigned char, playerDirection);
 
-// Huge pile of temporary variables
+// -------------------
+// TEMP VARIABLES
+// -------------------
 #define rawXPosition tempChar1
 #define rawYPosition tempChar2
 #define rawTileId tempChar3
@@ -41,31 +48,56 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 #define collisionTempXInt tempInt3
 #define collisionTempYInt tempInt4
 
- const unsigned char* introductionText = 
-                                "Welcome to the land of Riven! "
-                                "                              "
-                                "                              "
+// -------------------
+// OTHER VARIABLES
+// -------------------
+ const unsigned char* introductionText =
+    "Welcome to the land of Riven! "
+    "                              "
+    "                              "
 
-                                "You are an adventurer, yes?   "
-                                "                              "
-                                "                              "
+    "You are an adventurer, yes?   "
+    "                              "
+    "                              "
 
-                                "Your journey will be quite    "
-                                "difficult...                  "
-                                "                              "
+    "Your journey will be quite    "
+    "difficult...                  "
+    "                              "
 
-                                "But I believe in you!         "
-                                "                              "
-                                "                              "
+    "But I believe in you!         "
+    "                              "
+    "                              "
 
-                                "Good Luck!                    "
-                                "                              ";
-const unsigned char* movedText = 
-                                "Hey, you put me on another    "
-                                "screen! Cool!";
+    "Good Luck!                    "
+    "                              ";
 
+ const unsigned char* swordText =
+    "You have aquired              "
+    "The Adventurer's Sword        "
+    "                              "
+
+    "Stories say that one day a    "
+    "legendary adventurer would    "
+    "wield this blade...           "
+
+    "and use it to free            "
+    "the land of Riven!            "
+    "                              "
+
+
+    "Press [B] to attack           "
+    "Press [SELECT] to switch items";
+const unsigned char* movedText =
+    "Hey, you put me on another    "
+    "screen! Cool!";
+
+
+// -------------------
+// MAIN FUNCTIONS
+// -------------------
 // NOTE: This uses tempChar1 through tempChar3; the caller must not use these.
-void update_player_sprite(void) {
+void update_player_sprite(void)
+{
     // Calculate the position of the player itself, then use these variables to build it up with 4 8x8 NES sprites.
     rawXPosition = (playerXPosition >> PLAYER_POSITION_SHIFT);
     rawYPosition = (playerYPosition >> PLAYER_POSITION_SHIFT);
@@ -97,81 +129,101 @@ void update_player_sprite(void) {
 
 }
 
-void prepare_player_movement(void) {
+void player_movmentInput(void)
+{
+    int maxVelocity = PLAYER_MAX_VELOCITY;
+
+    // MOVE RIGHT
+    if (controllerState & PAD_RIGHT && playerXVelocity >= (0 - PLAYER_VELOCITY_NUDGE))
+    {
+        // If you're moving right, and you're not at max, speed up.
+        if (playerXVelocity < maxVelocity) { playerXVelocity += PLAYER_VELOCITY_ACCEL; }
+        // If you're over max somehow, we'll slow you down a little.
+        else if (playerXVelocity > maxVelocity) { playerXVelocity -= PLAYER_VELOCITY_ACCEL; }
+    }
+    // MOVE LEFT
+    else if (controllerState & PAD_LEFT && playerXVelocity <= (0 + PLAYER_VELOCITY_NUDGE))
+    {
+        // If you're moving left, and you're not at max, speed up.
+        if (ABS(playerXVelocity) < maxVelocity) { playerXVelocity -= PLAYER_VELOCITY_ACCEL; }
+        // If you're over max, slow you down a little...
+        else if (ABS(playerXVelocity) > maxVelocity) { playerXVelocity += PLAYER_VELOCITY_ACCEL; }
+    }
+    // NO HORIZONTAL
+    else if (playerXVelocity != 0)
+    {
+        // Not pressing anything? Let's slow you back down...
+        if (playerXVelocity > 0) { playerXVelocity -= PLAYER_VELOCITY_ACCEL; }
+        else { playerXVelocity += PLAYER_VELOCITY_ACCEL; }
+    }
+
+    // MOVE UP
+    if (controllerState & PAD_UP && playerYVelocity <= (0 + PLAYER_VELOCITY_NUDGE))
+    {
+        if (ABS(playerYVelocity) < maxVelocity) { playerYVelocity -= PLAYER_VELOCITY_ACCEL; }
+        else if (ABS(playerYVelocity) > maxVelocity) { playerYVelocity += PLAYER_VELOCITY_ACCEL; }
+    }
+    // MOVE DOWN
+    else if (controllerState & PAD_DOWN && playerYVelocity >= (0 - PLAYER_VELOCITY_NUDGE))
+    {
+        if (playerYVelocity < maxVelocity) { playerYVelocity += PLAYER_VELOCITY_ACCEL; }
+        else if (playerYVelocity > maxVelocity) { playerYVelocity -= PLAYER_VELOCITY_ACCEL; }
+    }
+    // NO VERTICAL
+    else
+    {
+        if (playerYVelocity > 0) { playerYVelocity -= PLAYER_VELOCITY_ACCEL; }
+        else if (playerYVelocity < 0) { playerYVelocity += PLAYER_VELOCITY_ACCEL; }
+    }
+
+    // JUMP
+    // TODO Add jump code
+}
+
+void prepare_player_movement(void)
+{
     // Using a variable, so we can change the velocity based on pressing a button, having a special item,
     // or whatever you like!
-    int maxVelocity = PLAYER_MAX_VELOCITY;
     lastControllerState = controllerState;
     controllerState = pad_poll(0);
 
     // If Start is pressed now, and was not pressed before...
-    if (controllerState & PAD_START && !(lastControllerState & PAD_START)) {
+    if (controllerState & PAD_START && !(lastControllerState & PAD_START))
+    {
         gameState = GAME_STATE_PAUSED;
         return;
     }
-    if (playerControlsLockTime) {
+    if (playerControlsLockTime)
+    {
         // If your controls are locked, just tick down the timer until they stop being locked. Don't read player input.
         playerControlsLockTime--;
-    } else {
-        if (controllerState & PAD_RIGHT && playerXVelocity >= (0 - PLAYER_VELOCITY_NUDGE)) {
-            // If you're moving right, and you're not at max, speed up.
-            if (playerXVelocity < maxVelocity) {
-                playerXVelocity += PLAYER_VELOCITY_ACCEL;
-            // If you're over max somehow, we'll slow you down a little.
-            } else if (playerXVelocity > maxVelocity) {
-                playerXVelocity -= PLAYER_VELOCITY_ACCEL;
-            }
-        } else if (controllerState & PAD_LEFT && playerXVelocity <= (0 + PLAYER_VELOCITY_NUDGE)) {
-            // If you're moving left, and you're not at max, speed up.
-            if (ABS(playerXVelocity) < maxVelocity) {
-                playerXVelocity -= PLAYER_VELOCITY_ACCEL;
-            // If you're over max, slow you down a little...
-            } else if (ABS(playerXVelocity) > maxVelocity) { 
-                playerXVelocity += PLAYER_VELOCITY_ACCEL;
-            }
-        } else if (playerXVelocity != 0) {
-            // Not pressing anything? Let's slow you back down...
-            if (playerXVelocity > 0) {
-                playerXVelocity -= PLAYER_VELOCITY_ACCEL;
-            } else {
-                playerXVelocity += PLAYER_VELOCITY_ACCEL;
-            }
-        }
-
-        if (controllerState & PAD_UP && playerYVelocity <= (0 + PLAYER_VELOCITY_NUDGE)) {
-            if (ABS(playerYVelocity) < maxVelocity) {
-                playerYVelocity -= PLAYER_VELOCITY_ACCEL;
-            } else if (ABS(playerYVelocity) > maxVelocity) {
-                playerYVelocity += PLAYER_VELOCITY_ACCEL;
-            }
-        } else if (controllerState & PAD_DOWN && playerYVelocity >= (0 - PLAYER_VELOCITY_NUDGE)) {
-            if (playerYVelocity < maxVelocity) {
-                playerYVelocity += PLAYER_VELOCITY_ACCEL;
-            } else if (playerYVelocity > maxVelocity) {
-                playerYVelocity -= PLAYER_VELOCITY_ACCEL;
-            }
-        } else { 
-            if (playerYVelocity > 0) {
-                playerYVelocity -= PLAYER_VELOCITY_ACCEL;
-            } else if (playerYVelocity < 0) {
-                playerYVelocity += PLAYER_VELOCITY_ACCEL;
-            }
-        }
+    }
+    else
+    {
+        player_movmentInput();
         
         // Now, slowly adjust to the grid as possible, if the player isn't pressing a direction. 
         #if PLAYER_MOVEMENT_STYLE == MOVEMENT_STYLE_GRID
-            if (playerYVelocity != 0 && playerXVelocity == 0 && (controllerState & (PAD_LEFT | PAD_RIGHT)) == 0) {
-                if ((char)((playerXPosition + PLAYER_POSITION_TILE_MASK_MIDDLE) & PLAYER_POSITION_TILE_MASK) > (char)(PLAYER_POSITION_TILE_MASK_MIDDLE)) {
+            if (playerYVelocity != 0 && playerXVelocity == 0 && (controllerState & (PAD_LEFT | PAD_RIGHT)) == 0)
+            {
+                if ((char)((playerXPosition + PLAYER_POSITION_TILE_MASK_MIDDLE) & PLAYER_POSITION_TILE_MASK) > (char)(PLAYER_POSITION_TILE_MASK_MIDDLE))
+                {
                     playerXVelocity = 0-PLAYER_VELOCITY_NUDGE;
-                } else if ((char)((playerXPosition + PLAYER_POSITION_TILE_MASK_MIDDLE) & PLAYER_POSITION_TILE_MASK) < (char)(PLAYER_POSITION_TILE_MASK_MIDDLE)) {
+                }
+                else if ((char)((playerXPosition + PLAYER_POSITION_TILE_MASK_MIDDLE) & PLAYER_POSITION_TILE_MASK) < (char)(PLAYER_POSITION_TILE_MASK_MIDDLE))
+                {
                     playerXVelocity = PLAYER_VELOCITY_NUDGE;
                 } // If equal, do nothing. That's our goal.
             }
 
-            if (playerXVelocity != 0 && playerYVelocity == 0 && (controllerState & (PAD_UP | PAD_DOWN)) == 0) {
-                if ((char)((playerYPosition + PLAYER_POSITION_TILE_MASK_MIDDLE + PLAYER_POSITION_TILE_MASK_EXTRA_NUDGE) & PLAYER_POSITION_TILE_MASK) > (char)(PLAYER_POSITION_TILE_MASK_MIDDLE)) {
+            if (playerXVelocity != 0 && playerYVelocity == 0 && (controllerState & (PAD_UP | PAD_DOWN)) == 0)
+            {
+                if ((char)((playerYPosition + PLAYER_POSITION_TILE_MASK_MIDDLE + PLAYER_POSITION_TILE_MASK_EXTRA_NUDGE) & PLAYER_POSITION_TILE_MASK) > (char)(PLAYER_POSITION_TILE_MASK_MIDDLE))
+                {
                     playerYVelocity = 0-PLAYER_VELOCITY_NUDGE;
-                } else if ((char)((playerYPosition + PLAYER_POSITION_TILE_MASK_MIDDLE + PLAYER_POSITION_TILE_MASK_EXTRA_NUDGE) & PLAYER_POSITION_TILE_MASK) < (char)(PLAYER_POSITION_TILE_MASK_MIDDLE)) {
+                }
+                else if ((char)((playerYPosition + PLAYER_POSITION_TILE_MASK_MIDDLE + PLAYER_POSITION_TILE_MASK_EXTRA_NUDGE) & PLAYER_POSITION_TILE_MASK) < (char)(PLAYER_POSITION_TILE_MASK_MIDDLE))
+                {
                     playerYVelocity = PLAYER_VELOCITY_NUDGE;
                 } // If equal, do nothing. That's our goal.
             }
@@ -180,7 +232,8 @@ void prepare_player_movement(void) {
     }
 
     // While we're at it, tick down the invulnerability timer if needed
-    if (playerInvulnerabilityTime) {
+    if (playerInvulnerabilityTime)
+    {
         playerInvulnerabilityTime--;
     }
 
@@ -189,7 +242,8 @@ void prepare_player_movement(void) {
 
 }
 
-void do_player_movement(void) {
+void do_player_movement(void)
+{
 
     // This will knock out the player's speed if they hit anything.
     test_player_tile_collision();
@@ -243,7 +297,8 @@ void do_player_movement(void) {
     }
 }
 
-void test_player_tile_collision(void) {
+void test_player_tile_collision(void)
+{
 
     if (playerYVelocity != 0) {
         collisionTempYInt = playerYPosition + PLAYER_Y_OFFSET_EXTENDED + playerYVelocity;
@@ -339,16 +394,21 @@ void test_player_tile_collision(void) {
     }
 }
 
-void handle_player_sprite_collision(void) {
+void handle_player_sprite_collision(void)
+{
     // We store the last sprite hit when we update the sprites in `map_sprites.c`, so here all we have to do is react to it.
-    if (lastPlayerSpriteCollisionId != NO_SPRITE_HIT) {
+    if (lastPlayerSpriteCollisionId != NO_SPRITE_HIT)
+    {
         currentMapSpriteIndex = lastPlayerSpriteCollisionId<<MAP_SPRITE_DATA_SHIFT;
-        switch (currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE]) {
+
+        switch (currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE])
+        {
             case SPRITE_TYPE_HEALTH:
                 // This if statement ensures that we don't remove hearts if you don't need them yet.
                 if (playerHealth < playerMaxHealth) {
                     playerHealth += currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_HEALTH];
-                    if (playerHealth > playerMaxHealth) {
+                    if (playerHealth > playerMaxHealth)
+                    {
                         playerHealth = playerMaxHealth;
                     }
                     // Hide the sprite now that it has been taken.
@@ -361,8 +421,10 @@ void handle_player_sprite_collision(void) {
                     currentMapSpritePersistance[playerOverworldPosition] |= bitToByte[lastPlayerSpriteCollisionId];
                 }
                 break;
+
             case SPRITE_TYPE_KEY:
-                if (playerKeyCount < MAX_KEY_COUNT) {
+                if (playerKeyCount < MAX_KEY_COUNT)
+                {
                     playerKeyCount++;
                     currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
 
@@ -372,16 +434,59 @@ void handle_player_sprite_collision(void) {
                     currentMapSpritePersistance[playerOverworldPosition] |= bitToByte[lastPlayerSpriteCollisionId];
                 }
                 break;
+
+            case SPRITE_TYPE_COIN:
+                if (playerScoreCount < 999)
+                {
+                    playerScoreCount += currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_HEALTH];
+                    currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
+
+                    sfx_play(SFX_KEY, SFX_CHANNEL_3);
+
+                    // Mark the sprite as collected, so we can't get it again.
+                    currentMapSpritePersistance[playerOverworldPosition] |= bitToByte[lastPlayerSpriteCollisionId];
+                }
+                break;
+
+            case SPRITE_TYPE_SWORD:
+                if (playerHasSword == 0)
+                {
+                    playerHasSword = 1;
+                    trigger_game_text(swordText);
+                    currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
+
+                    sfx_play(SFX_KEY, SFX_CHANNEL_3);
+
+                    // Mark the sprite as collected, so we can't get it again.
+                    currentMapSpritePersistance[playerOverworldPosition] |= bitToByte[lastPlayerSpriteCollisionId];
+                }
+                break;
+
+            case SPRITE_TYPE_BOMB_ITEM:
+                if (playerBombCount < MAX_KEY_COUNT)
+                {
+                    playerHasBomb = 1;
+                    playerBombCount++;
+                    currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
+
+                    sfx_play(SFX_KEY, SFX_CHANNEL_3);
+
+                    // Mark the sprite as collected, so we can't get it again.
+                    currentMapSpritePersistance[playerOverworldPosition] |= bitToByte[lastPlayerSpriteCollisionId];
+                }
+                break;
+
             case SPRITE_TYPE_REGULAR_ENEMY:
             case SPRITE_TYPE_INVULNERABLE_ENEMY:
-
-                if (playerInvulnerabilityTime) {
+                if (playerInvulnerabilityTime)
+                {
                     return;
                 }
                 playerHealth -= currentMapSpriteData[currentMapSpriteIndex + MAP_SPRITE_DATA_POS_DAMAGE]; 
                 // Since playerHealth is unsigned, we need to check for wraparound damage. 
                 // NOTE: If something manages to do more than 16 damage at once, this might fail.
-                if (playerHealth == 0 || playerHealth > 240) {
+                if (playerHealth == 0 || playerHealth > 240)
+                {
                     gameState = GAME_STATE_GAME_OVER;
                     music_stop();
                     sfx_play(SFX_GAMEOVER, SFX_CHANNEL_1);
@@ -390,30 +495,37 @@ void handle_player_sprite_collision(void) {
                 // Knock the player back
                 playerControlsLockTime = PLAYER_DAMAGE_CONTROL_LOCK_TIME;
                 playerInvulnerabilityTime = PLAYER_DAMAGE_INVULNERABILITY_TIME;
-                if (playerDirection == SPRITE_DIRECTION_LEFT) {
+                if (playerDirection == SPRITE_DIRECTION_LEFT)
+                {
                     // Punt them back in the opposite direction
                     playerXVelocity = PLAYER_MAX_VELOCITY;
                     // Reverse their velocity in the other direction, too.
                     playerYVelocity = 0 - playerYVelocity;
-                } else if (playerDirection == SPRITE_DIRECTION_RIGHT) {
+                }
+                else if (playerDirection == SPRITE_DIRECTION_RIGHT)
+                {
                     playerXVelocity = 0-PLAYER_MAX_VELOCITY;
                     playerYVelocity = 0 - playerYVelocity;
-                } else if (playerDirection == SPRITE_DIRECTION_DOWN) {
+                }
+                else if (playerDirection == SPRITE_DIRECTION_DOWN)
+                {
                     playerYVelocity = 0-PLAYER_MAX_VELOCITY;
                     playerXVelocity = 0 - playerXVelocity;
-                } else { // Make being thrown downward into a catch-all, in case your direction isn't set or something.
+                }
+                else
+                { // Make being thrown downward into a catch-all, in case your direction isn't set or something.
                     playerYVelocity = PLAYER_MAX_VELOCITY;
                     playerXVelocity = 0 - playerXVelocity;
                 }
                 sfx_play(SFX_HURT, SFX_CHANNEL_2);
-
-                
                 break;
+
             case SPRITE_TYPE_DOOR: 
                 // Doors without locks are very simple - they just open! Hide the sprite until the user comes back...
                 // note that we intentionally *don't* store this state, so it comes back next time.
                 currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
                 break;
+
             case SPRITE_TYPE_DOOR_LOCKED:
                 // First off, do you have a key? If so, let's just make this go away...
                 if (playerKeyCount > 0) {
@@ -431,11 +543,12 @@ void handle_player_sprite_collision(void) {
                 playerXVelocity = 0;
                 playerYVelocity = 0;
                 playerControlsLockTime = 0;
-
                 break;
+
             case SPRITE_TYPE_ENDGAME:
                 gameState = GAME_STATE_CREDITS;
                 break;
+
             case SPRITE_TYPE_NPC:
                 // Okay, we collided with this NPC before we calculated the player's movement. After being moved, does the 
                 // new player position also collide? If so, stop it. Else, let it go.
@@ -446,9 +559,12 @@ void handle_player_sprite_collision(void) {
 
                 if (controllerState & PAD_A && !(lastControllerState & PAD_A)) {
                     // Show the text for the player on the first screen
-                    if (playerOverworldPosition == 0) {
+                    if (playerOverworldPosition == 0)
+                    {
                         trigger_game_text(introductionText);
-                    } else {
+                    }
+                    else
+                    {
                         // If it's on another screen, show some different text :)
                         trigger_game_text(movedText);
                     }
@@ -460,3 +576,8 @@ void handle_player_sprite_collision(void) {
 
     }
 }
+
+
+// -------------------
+// INTERNAL FUNCTIONS
+// -------------------
