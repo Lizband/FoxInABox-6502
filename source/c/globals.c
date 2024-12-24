@@ -11,6 +11,7 @@ ZEROPAGE_DEF(unsigned char, j);
 ZEROPAGE_DEF(unsigned char, playerHealth);
 ZEROPAGE_DEF(unsigned char, playerScoreCount);
 ZEROPAGE_DEF(unsigned char, playerKeyCount);
+ZEROPAGE_DEF(unsigned char, playerBombCount);
 ZEROPAGE_DEF(unsigned char, playerMaxHealth);
 ZEROPAGE_DEF(unsigned char, playerSelectedItem);
 ZEROPAGE_DEF(unsigned char, playerHasSword);
@@ -19,8 +20,8 @@ ZEROPAGE_DEF(unsigned char, playerHasMagic);
 ZEROPAGE_DEF(unsigned char, gameState);
 ZEROPAGE_DEF(unsigned char, currentWorldId);
 
-ZEROPAGE_DEF(unsigned char, currentWorldId);
-ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x20);
+ZEROPAGE_DEF(unsigned char, charoffset);
+ZEROPAGE_ARRAY_DEF(unsigned char, screenBuffer, 0x40);
 
 ZEROPAGE_DEF(unsigned char, everyOtherCycle);
 

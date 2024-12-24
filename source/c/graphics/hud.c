@@ -18,19 +18,6 @@ void draw_hud(void)
     for (i = 0; i != 16; ++i) { vram_put(0xff); }
 
     // Add additional STATIC HUD assets below this point
-    // Inventory frames
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START);
-    vram_put(HUD_TILE_ITEM_UNL);
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START+4);
-    vram_put(HUD_TILE_ITEM_UNR);
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START+32);
-    vram_put(HUD_TILE_ITEM_UNL);
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START+4+32);
-    vram_put(HUD_TILE_ITEM_UNR);
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START+64);
-    vram_put(HUD_TILE_ITEM_UNL);
-    vram_adr(NAMETABLE_A + HUD_INVENTORY_START+4+64);
-    vram_put(HUD_TILE_ITEM_UNR);
 }
 
 void update_hud(void)
@@ -70,24 +57,121 @@ void update_hud(void)
     screenBuffer[i++] = HUD_TILE_NUMBER + playerKeyCount;
 
     // Selected items
-    // Item SWORD
-    /*charoffset = 0;
-    for (j = 0; j != 6; j++)
+    switch (playerSelectedItem)
     {
-        screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START + charoffset) | NT_UPD_HORZ;
-        screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START + charoffset);
-        screenBuffer[i++] = 1;
-        if (j == 0 || j == 2 || j == 4)
-        {
+        case 0:
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_SEL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_SER;
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+32) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+32);
+            screenBuffer[i++] = 4;
             screenBuffer[i++] = HUD_TILE_ITEM_UNL;
-            charoffset += 4;
-        }
-        else ()
-        {
+            i+=2;
             screenBuffer[i++] = HUD_TILE_ITEM_UNR;
-            charoffset += 4+32;
-        }
-    }*/
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+64) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+64);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNR;
+            break;
+        case 1:
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNR;
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+32) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+32);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_SEL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_SER;
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+64) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+64);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNR;
+            break;
+        case 2:
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNR;
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+32) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+32);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_UNR;
+
+            screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+64) | NT_UPD_HORZ;
+            screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+64);
+            screenBuffer[i++] = 4;
+            screenBuffer[i++] = HUD_TILE_ITEM_SEL;
+            i+=2;
+            screenBuffer[i++] = HUD_TILE_ITEM_SER;
+            break;
+    }
+
+    // Aquired items
+    // SWORD
+    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+1) | NT_UPD_HORZ;
+    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+1);
+    screenBuffer[i++] = 2;
+    if (playerHasSword == 1)
+    {
+            screenBuffer[i++] = HUD_TILE_SWORD;
+            screenBuffer[i++] = HUD_TILE_SWORD+1;
+    }
+    else
+    {
+            screenBuffer[i++] = HUD_TILE_BLANK;
+            screenBuffer[i++] = HUD_TILE_BLANK+1;
+    }
+
+    // BOMB
+    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+33) | NT_UPD_HORZ;
+    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+33);
+    screenBuffer[i++] = 2;
+    if (playerHasBomb == 1)
+    {
+            screenBuffer[i++] = HUD_TILE_BOMB;
+            screenBuffer[i++] = HUD_TILE_NUMBER+playerBombCount;
+    }
+    else
+    {
+            screenBuffer[i++] = HUD_TILE_BLANK;
+            screenBuffer[i++] = HUD_TILE_BLANK;
+    }
+
+    // MAGIC
+    screenBuffer[i++] = MSB(NAMETABLE_A + HUD_INVENTORY_START+65) | NT_UPD_HORZ;
+    screenBuffer[i++] = LSB(NAMETABLE_A + HUD_INVENTORY_START+65);
+    screenBuffer[i++] = 2;
+    if (playerHasMagic == 1)
+    {
+            screenBuffer[i++] = HUD_TILE_MAGIC;
+            screenBuffer[i++] = HUD_TILE_MAGIC+1;
+    }
+    else
+    {
+            screenBuffer[i++] = HUD_TILE_BLANK;
+            screenBuffer[i++] = HUD_TILE_BLANK;
+    }
 
 
 
