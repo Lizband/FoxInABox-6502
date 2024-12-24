@@ -6,10 +6,10 @@
     "fileStates": {
         "overworld.tmx": {
             "scale": 3,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 182.66666666666666,
-                "y": 124.66666666666664
+                "x": 193.33333333333331,
+                "y": 125
             }
         },
         "overworld.tmx#Overworld Tiles": {

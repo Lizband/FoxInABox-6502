@@ -24,8 +24,13 @@ void draw_win_screen(void) {
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
     put_str(NTADR_A(7, 2), "- Congratulations -");
 
-    put_str(NTADR_A(4, 8), "You did the thing, and");
-    put_str(NTADR_A(4, 9), "thus won the game!");
+    put_str(NTADR_A(6, 8), "You've recovered the");
+    put_str(NTADR_A(8, 9), "Ember Artifact");
+    put_str(NTADR_A(6, 10), "and sealed away the");
+    put_str(NTADR_A(8, 11), "last nightfaller!");
+    put_str(NTADR_A(6, 12), "The land of riven");
+    put_str(NTADR_A(8, 13), "has been saved...");
+    put_str(NTADR_A(7, 15), "- until next time -");
 
     // Hide all existing sprites
     oam_clear();
@@ -46,22 +51,21 @@ void draw_credits_screen(void) {
     set_chr_bank_1(CHR_BANK_MENU);
 
     // Add whatever you want here; NTADR_A just picks a position on the screen for you. Your options are 0, 0 to 32, 30
-    put_str(NTADR_A(11, 2), "- Credits -");
+    put_str(NTADR_A(10, 2), "- Credits -");
 
-    put_str(NTADR_A(2, 6), "Game Design and Logic");
-    put_str(NTADR_A(4, 8), gameAuthor);
+    put_str(NTADR_A(2, 6), "Programming & Artwork");
+    put_str(NTADR_A(4, 8), "Liz M.");
 
     put_str(NTADR_A(2, 11), "Music");
-    put_str(NTADR_A(4, 13), "Wolfgang (OpenGameArt)");
+    put_str(NTADR_A(4, 13), "Alex P.");
 
-    put_str(NTADR_A(2, 16), "Artwork");
-    put_str(NTADR_A(4, 18), "Refresh Games (OpenGameArt)");
+    put_str(NTADR_A(5, 21), "Thank you for playing!");
 
-    put_str(NTADR_A(6, 24), "Created in");
-    put_str(NTADR_A(17, 24), currentYear);
-    put_str(NTADR_A(22, 24), "by");
+    put_str(NTADR_A(6, 25), "Created in");
+    put_str(NTADR_A(17, 25), currentYear);
+    put_str(NTADR_A(22, 25), "by");
 
-    put_str(NTADR_A(8, 26), gameAuthor);
+    put_str(NTADR_A(11, 27), gameAuthor);
 
 
     // Hide all existing sprites

@@ -42,13 +42,24 @@ ZEROPAGE_DEF(unsigned char, playerDirection);
 #define collisionTempYInt tempInt4
 
  const unsigned char* introductionText = 
-                                "Welcome to nes-starter-kit! I " 
-                                "am an NPC.                    "
+                                "Welcome to the land of Riven! "
+                                "                              "
                                 "                              "
 
-                                "Hope you're having fun!       "
+                                "You are an adventurer, yes?   "
                                 "                              "
-                                "- The Developer";
+                                "                              "
+
+                                "Your journey will be quite    "
+                                "difficult...                  "
+                                "                              "
+
+                                "But I believe in you!         "
+                                "                              "
+                                "                              "
+
+                                "Good Luck!                    "
+                                "                              ";
 const unsigned char* movedText = 
                                 "Hey, you put me on another    "
                                 "screen! Cool!";
@@ -403,7 +414,7 @@ void handle_player_sprite_collision(void) {
                 // note that we intentionally *don't* store this state, so it comes back next time.
                 currentMapSpriteData[(currentMapSpriteIndex) + MAP_SPRITE_DATA_POS_TYPE] = SPRITE_TYPE_OFFSCREEN;
                 break;
-            case SPRITE_TYPE_LOCKED_DOOR:
+            case SPRITE_TYPE_DOOR_LOCKED:
                 // First off, do you have a key? If so, let's just make this go away...
                 if (playerKeyCount > 0) {
                     playerKeyCount--;

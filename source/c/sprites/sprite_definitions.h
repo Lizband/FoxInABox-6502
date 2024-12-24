@@ -33,14 +33,20 @@
 // Use _NOTHING for decoration sprites that don't do anything when collided with.
 // This can be used for decorations, etc...
 #define SPRITE_TYPE_NOTHING 0x00
-#define SPRITE_TYPE_KEY 0x01
-#define SPRITE_TYPE_HEALTH 0x02
-#define SPRITE_TYPE_REGULAR_ENEMY 0x03 
-#define SPRITE_TYPE_INVULNERABLE_ENEMY 0x04
-#define SPRITE_TYPE_DOOR 0x05
-#define SPRITE_TYPE_LOCKED_DOOR 0x06
-#define SPRITE_TYPE_ENDGAME 0x07
-#define SPRITE_TYPE_NPC 0x10
+#define SPRITE_TYPE_HEALTH 0x01
+#define SPRITE_TYPE_KEY 0x02
+#define SPRITE_TYPE_COIN 0x03
+#define SPRITE_TYPE_ENDGAME 0x04
+#define SPRITE_TYPE_SWORD 0x05
+#define SPRITE_TYPE_BOMB_ITEM 0x06
+#define SPRITE_TYPE_BOMB_THROWN 0x07
+#define SPRITE_TYPE_DOOR 0x08
+#define SPRITE_TYPE_DOOR_OPEN 0x09
+#define SPRITE_TYPE_DOOR_LOCKED 0x0a
+#define SPRITE_TYPE_DOOR_BOSS 0x0b
+#define SPRITE_TYPE_NPC 0x0c
+#define SPRITE_TYPE_REGULAR_ENEMY 0x0d
+#define SPRITE_TYPE_INVULNERABLE_ENEMY 0x0e
 
 // Use this when a sprite is destroyed - this will skip all logic about the sprite.
 #define SPRITE_TYPE_OFFSCREEN 0x7f
